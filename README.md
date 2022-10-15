@@ -27,6 +27,8 @@ $ ruby main.rb
 12
 > (/ 30 5)
 6
+> (* (+ 1 2) (- 9 4))
+15
 ```
 
 以下は 1 から 10 までの和を求めるプログラムです.
@@ -37,7 +39,7 @@ $ ruby main.rb
 
 > (setq sum 0)
 
-> (while i (do (setq sum (+ sum i)) (setq i (- i 1))))
+> (while i (do (+= sum i) (-= i 1)))
 
 > (print sum)
 55
