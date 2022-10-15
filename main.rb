@@ -17,7 +17,7 @@ def test_lex()
     { src: "(setq a 2)", exp: ["(", "setq", "a", "2", ")"] },
     { src: "(+ a 2)", exp: ["(", "+", "a", "2", ")"] },
     { src: "(if 0 1 2)", exp: ["(", "if", "0", "1", "2", ")"] },
-    { src: "(while i (- i 1))", exp: ["(", "while", "i", "(", "-", "i", "1", ")", ")"] },
+    { src: "(while i (setq i (- i 1)))", exp: ["(", "while", "i", "(", "setq", "i", "(", "-", "i", "1", ")", ")", ")"] },
   ]
 
   for t in tests
@@ -69,7 +69,7 @@ def test_parse()
     { src: "(setq a 2)", exp: ["setq", "a", "2"] },
     { src: "(+ a 2)", exp: ["+", "a", "2"] },
     { src: "(if 0 1 2)", exp: ["if", "0", "1", "2"] },
-    { src: "(while i (- i 1))", exp: ["while", "i", ["-", "i", "1"]] },
+    { src: "(while i (setq i (- i 1)))", exp: ["while", "i", ["setq", "i", ["-", "i", "1"]]] },
   ]
 
   for t in tests
@@ -83,6 +83,8 @@ end
 test_parse
 
 def eval_list(ast, env)
+  ast = Marshal.load(Marshal.dump(ast))
+
   func = ast.shift
 
   case func
@@ -127,6 +129,16 @@ def eval_list(ast, env)
       ast.shift
       return eval(ast.shift, env)
     end
+  when "while"
+    cond, statement = ast
+    while true
+      condval, env = eval(cond, env)
+      if condval == 0
+        return nil, env
+      else
+        _, env = eval(statement.clone, env)
+      end
+    end
   else
     p "err: func is #{func}"
     return nil, env
@@ -167,7 +179,7 @@ def test_eval()
     { src: "(+ a 2)", srcenv: { a: 2 }, exp: 4, expenv: { a: 2 } },
     { src: "(if 0 1 2)", srcenv: {}, exp: 2, expenv: {} },
     { src: "(if 1 1 2)", srcenv: {}, exp: 1, expenv: {} },
-    { src: "(while i (- i 1))", srcenv: { i: 10 }, exp: nil, expenv: { i: 0 } },
+    { src: "(while i (setq i (- i 1)))", srcenv: { i: 10 }, exp: nil, expenv: { i: 0 } },
   ]
 
   for t in tests
@@ -198,4 +210,4 @@ def main()
   end
 end
 
-# main
+main
