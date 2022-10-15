@@ -76,22 +76,23 @@ end
 
 test_parse
 
-def eval_list(ast)
+def eval_list(ast, env)
   func = ast.shift
 
   case func
   when "+"
-    default = eval(ast.shift)
-    return ast.inject(default) { |sum, i| sum + eval(i) }
+    default = eval(ast.shift, env)
+    return ast.inject(default) { |sum, i| sum + eval(i, env) }
   when "-"
-    default = eval(ast.shift)
-    return ast.inject(default) { |res, i| res - eval(i) }
+    default = eval(ast.shift, env)
+    return ast.inject(default) { |res, i| res - eval(i, env) }
   when "*"
-    default = eval(ast.shift)
-    return ast.inject(default) { |mul, i| mul * eval(i) }
+    default = eval(ast.shift, env)
+    return ast.inject(default) { |mul, i| mul * eval(i, env) }
   when "/"
-    default = eval(ast.shift)
-    return ast.inject(default) { |res, i| res / eval(i) }
+    default = eval(ast.shift, env)
+    return ast.inject(default) { |res, i| res / eval(i, env) }
+  when "setq"
   else
     p "err: func is #{func}"
   end
@@ -101,9 +102,9 @@ def eval_num(ast)
   return ast.to_i
 end
 
-def eval(ast)
+def eval(ast, env)
   if ast.instance_of?(Array)
-    return eval_list(ast)
+    return eval_list(ast, env)
   elsif ast.instance_of?(String)
     return eval_num(ast)
   else
@@ -126,7 +127,8 @@ def test_eval()
   ]
 
   for t in tests
-    act = eval parse lex t[:src]
+    ast = parse lex t[:src]
+    act, envout = eval ast, {}
     if act != t[:exp]
       puts "want #{t[:exp]} but got #{act}"
     end
@@ -142,7 +144,9 @@ def main()
     if text == nil
       break
     end
-    puts "#{eval parse lex text}"
+    ast = parse lex text
+    res, env = eval ast, env
+    puts "#{res}"
   end
 end
 
