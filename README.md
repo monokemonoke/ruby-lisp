@@ -44,3 +44,18 @@ $ ruby main.rb
 > (print sum)
 55
 ```
+
+また以下のように 30 番目のフィボナッチ数を求めることもできます.
+```
+$ ruby main.rb
+> (setq i 0)
+
+> (setq a 0)
+
+> (setq b 1)
+
+> (while (< i 30) (do (setq c a) (setq a b) (+= b c) (+= i 1)))
+
+> (print b)
+1346269
+```
