@@ -15,6 +15,7 @@ def test_lex()
     { src: "(+ -10 252)", exp: ["(", "+", "-10", "252", ")"] },
     { src: "(*  1 (+ 2 3))", exp: ["(", "*", "1", "(", "+", "2", "3", ")", ")"] },
     { src: "(setq a 2)", exp: ["(", "setq", "a", "2", ")"] },
+    { src: "(+ a 2)", exp: ["(", "+", "a", "2", ")"] },
   ]
 
   for t in tests
@@ -64,6 +65,7 @@ def test_parse()
     { src: "(*  1 (+ 2 3))", exp: ["*", "1", ["+", "2", "3"]] },
     { src: "(*  (+ 3 2) (- 13 4))", exp: ["*", ["+", "3", "2"], ["-", "13", "4"]] },
     { src: "(setq a 2)", exp: ["setq", "a", "2"] },
+    { src: "(+ a 2)", exp: ["+", "a", "2"] },
   ]
 
   for t in tests
@@ -118,37 +120,43 @@ def eval_list(ast, env)
   end
 end
 
-def eval_num(ast)
-  return ast.to_i
+def eval_num(ast, env)
+  if /^[+-]?\d+.?\d*$/.match?(ast)
+    return ast.to_i
+  end
+
+  return env[ast.intern]
 end
 
 def eval(ast, env)
   if ast.instance_of?(Array)
     return eval_list(ast, env)
   elsif ast.instance_of?(String)
-    return eval_num(ast), env
+    return eval_num(ast, env), env
   else
     p "err: got #{ast}"
+    return nil, env
   end
 end
 
 def test_eval()
   tests = [
-    { src: "(+ 1 2)", exp: 3, expenv: {} },
-    { src: "(- 1 2)", exp: -1, expenv: {} },
-    { src: "(* 1 2)", exp: 2, expenv: {} },
-    { src: "(/ 1 2)", exp: 0, expenv: {} },
-    { src: "(+ 10 2)", exp: 12, expenv: {} },
-    { src: "(+ -10 2)", exp: -8, expenv: {} },
-    { src: "(+ -10 252)", exp: 242, expenv: {} },
-    { src: "(*  1 (+ 2 3))", exp: 5, expenv: {} },
-    { src: "(*  (+ 3 2) (- 13 4))", exp: 45, expenv: {} },
-    { src: "(setq a 2)", exp: nil, expenv: { a: 2 } },
+    { src: "(+ 1 2)", srcenv: {}, exp: 3, expenv: {} },
+    { src: "(- 1 2)", srcenv: {}, exp: -1, expenv: {} },
+    { src: "(* 1 2)", srcenv: {}, exp: 2, expenv: {} },
+    { src: "(/ 1 2)", srcenv: {}, exp: 0, expenv: {} },
+    { src: "(+ 10 2)", srcenv: {}, exp: 12, expenv: {} },
+    { src: "(+ -10 2)", srcenv: {}, exp: -8, expenv: {} },
+    { src: "(+ -10 252)", srcenv: {}, exp: 242, expenv: {} },
+    { src: "(*  1 (+ 2 3))", srcenv: {}, exp: 5, expenv: {} },
+    { src: "(*  (+ 3 2) (- 13 4))", srcenv: {}, exp: 45, expenv: {} },
+    { src: "(setq a 2)", srcenv: {}, exp: nil, expenv: { a: 2 } },
+    { src: "(+ a 2)", srcenv: { a: 2 }, exp: 4, expenv: { a: 2 } },
   ]
 
   for t in tests
     ast = parse lex t[:src]
-    act, envout = eval ast, {}
+    act, envout = eval ast, t[:srcenv]
     if act != t[:exp]
       puts "want #{t[:exp]} but got #{act}"
     end
@@ -161,6 +169,7 @@ end
 test_eval
 
 def main()
+  env = {}
   while true
     print "> "
     text = gets
