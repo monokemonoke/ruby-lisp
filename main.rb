@@ -117,6 +117,14 @@ def eval_list(ast, env)
     val, env = eval(ast.shift, env)
     env[symbol.intern] = val
     return nil, env
+  when "if"
+    condition, env = eval(ast.shift, env)
+    if condition != 0
+      return eval(ast.shift, env)
+    else
+      ast.shift
+      return eval(ast.shift, env)
+    end
   else
     p "err: func is #{func}"
   end
@@ -186,4 +194,4 @@ def main()
   end
 end
 
-# main
+main
