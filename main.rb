@@ -19,6 +19,7 @@ def test_lex()
     { src: "(if 0 1 2)", exp: ["(", "if", "0", "1", "2", ")"] },
     { src: "(while i (setq i (- i 1)))", exp: ["(", "while", "i", "(", "setq", "i", "(", "-", "i", "1", ")", ")", ")"] },
     { src: "(print a 2)", exp: ["(", "print", "a", "2", ")"] },
+    { src: "(do (setq i 0) (+ i 1))", exp: ["(", "do", "(", "setq", "i", "0", ")", "(", "+", "i", "1", ")", ")"] },
   ]
 
   for t in tests
@@ -72,6 +73,7 @@ def test_parse()
     { src: "(if 0 1 2)", exp: ["if", "0", "1", "2"] },
     { src: "(while i (setq i (- i 1)))", exp: ["while", "i", ["setq", "i", ["-", "i", "1"]]] },
     { src: "(print a 2)", exp: ["print", "a", "2"] },
+    { src: "(do (setq i 0) (+ i 1))", exp: ["do", ["setq", "i", "0"], ["+", "i", "1"]] },
   ]
 
   for t in tests
@@ -148,6 +150,11 @@ def eval_list(ast, env)
     end
     puts
     return nil, env
+  when "do"
+    for statement in ast
+      _, env = eval(statement, env)
+    end
+    return nil, env
   else
     p "err: func is #{func}"
     return nil, env
@@ -189,6 +196,7 @@ def test_eval()
     { src: "(if 0 1 2)", srcenv: {}, exp: 2, expenv: {} },
     { src: "(if 1 1 2)", srcenv: {}, exp: 1, expenv: {} },
     { src: "(while i (setq i (- i 1)))", srcenv: { i: 10 }, exp: nil, expenv: { i: 0 } },
+    { src: "(do (setq i 0) (setq i (+ i 1)))", srcenv: {}, exp: nil, expenv: { i: 1 } },
   ]
 
   for t in tests
