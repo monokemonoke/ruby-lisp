@@ -114,16 +114,16 @@ end
 
 def test_eval()
   tests = [
-    { src: "(+ 1 2)", exp: 3 },
-    { src: "(- 1 2)", exp: -1 },
-    { src: "(* 1 2)", exp: 2 },
-    { src: "(/ 1 2)", exp: 0 },
-    { src: "(+ 10 2)", exp: 12 },
-    { src: "(+ -10 2)", exp: -8 },
-    { src: "(+ -10 252)", exp: 242 },
-    { src: "(*  1 (+ 2 3))", exp: 5 },
-    { src: "(*  (+ 3 2) (- 13 4))", exp: 45 },
-    { src: "(setq a 2)", exp: nil },
+    { src: "(+ 1 2)", exp: 3, expenv: {} },
+    { src: "(- 1 2)", exp: -1, expenv: {} },
+    { src: "(* 1 2)", exp: 2, expenv: {} },
+    { src: "(/ 1 2)", exp: 0, expenv: {} },
+    { src: "(+ 10 2)", exp: 12, expenv: {} },
+    { src: "(+ -10 2)", exp: -8, expenv: {} },
+    { src: "(+ -10 252)", exp: 242, expenv: {} },
+    { src: "(*  1 (+ 2 3))", exp: 5, expenv: {} },
+    { src: "(*  (+ 3 2) (- 13 4))", exp: 45, expenv: {} },
+    { src: "(setq a 2)", exp: nil, expenv: { a: 2 } },
   ]
 
   for t in tests
@@ -131,6 +131,9 @@ def test_eval()
     act, envout = eval ast, {}
     if act != t[:exp]
       puts "want #{t[:exp]} but got #{act}"
+    end
+    if envout != t[:expenv]
+      puts "want #{t[:expenv]} but got #{envout}"
     end
   end
 end
