@@ -81,18 +81,38 @@ def eval_list(ast, env)
 
   case func
   when "+"
-    default = eval(ast.shift, env)
-    return ast.inject(default) { |sum, i| sum + eval(i, env) }
+    default, env = eval(ast.shift, env)
+    res = ast.inject(default) do |sum, i|
+      val, env = eval(i, env)
+      sum += val
+    end
+    return res, env
   when "-"
-    default = eval(ast.shift, env)
-    return ast.inject(default) { |res, i| res - eval(i, env) }
+    default, env = eval(ast.shift, env)
+    res = ast.inject(default) do |sum, i|
+      val, env = eval(i, env)
+      sum -= val
+    end
+    return res, env
   when "*"
-    default = eval(ast.shift, env)
-    return ast.inject(default) { |mul, i| mul * eval(i, env) }
+    default, env = eval(ast.shift, env)
+    res = ast.inject(default) do |sum, i|
+      val, env = eval(i, env)
+      sum *= val
+    end
+    return res, env
   when "/"
-    default = eval(ast.shift, env)
-    return ast.inject(default) { |res, i| res / eval(i, env) }
+    default, env = eval(ast.shift, env)
+    res = ast.inject(default) do |sum, i|
+      val, env = eval(i, env)
+      sum /= val
+    end
+    return res, env
   when "setq"
+    symbol = ast.shift
+    val, env = eval(ast.shift, env)
+    env[symbol.intern] = val
+    return nil, env
   else
     p "err: func is #{func}"
   end
@@ -106,7 +126,7 @@ def eval(ast, env)
   if ast.instance_of?(Array)
     return eval_list(ast, env)
   elsif ast.instance_of?(String)
-    return eval_num(ast)
+    return eval_num(ast), env
   else
     p "err: got #{ast}"
   end
