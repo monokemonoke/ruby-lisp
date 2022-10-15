@@ -35,11 +35,11 @@ $ ruby main.rb
 
 ```
 $ ruby main.rb
-> (setq i 10)
+> (setq i 0)
 
 > (setq sum 0)
 
-> (while i (do (+= sum i) (-= i 1)))
+> (while (<= i 10) (do (+= sum i) (+= i 1)))
 
 > (print sum)
 55

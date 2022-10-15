@@ -22,6 +22,10 @@ def test_lex()
     { src: "(do (setq i 0) (+ i 1))", exp: ["(", "do", "(", "setq", "i", "0", ")", "(", "+", "i", "1", ")", ")"] },
     { src: "(+= a 2)", exp: ["(", "+=", "a", "2", ")"] },
     { src: "(-= a 2)", exp: ["(", "-=", "a", "2", ")"] },
+    { src: "(< a 2)", exp: ["(", "<", "a", "2", ")"] },
+    { src: "(> a 2)", exp: ["(", ">", "a", "2", ")"] },
+    { src: "(<= a 2)", exp: ["(", "<=", "a", "2", ")"] },
+    { src: "(>= a 2)", exp: ["(", ">=", "a", "2", ")"] },
   ]
 
   for t in tests
@@ -78,6 +82,10 @@ def test_parse()
     { src: "(do (setq i 0) (+ i 1))", exp: ["do", ["setq", "i", "0"], ["+", "i", "1"]] },
     { src: "(+= a 2)", exp: ["+=", "a", "2"] },
     { src: "(-= a 2)", exp: ["-=", "a", "2"] },
+    { src: "(< a 2)", exp: ["<", "a", "2"] },
+    { src: "(> a 2)", exp: [">", "a", "2"] },
+    { src: "(<= a 2)", exp: ["<=", "a", "2"] },
+    { src: "(>= a 2)", exp: [">=", "a", "2"] },
   ]
 
   for t in tests
@@ -177,6 +185,26 @@ def eval_list(ast, env)
     end
     env[symbol.intern] = res
     return nil, env
+  when "<"
+    left, env = eval(ast.shift, env)
+    right, env = eval(ast.shift, env)
+    res = if left < right then 1 else 0 end
+    return res, env
+  when ">"
+    left, env = eval(ast.shift, env)
+    right, env = eval(ast.shift, env)
+    res = if left > right then 1 else 0 end
+    return res, env
+  when "<="
+    left, env = eval(ast.shift, env)
+    right, env = eval(ast.shift, env)
+    res = if left <= right then 1 else 0 end
+    return res, env
+  when ">="
+    left, env = eval(ast.shift, env)
+    right, env = eval(ast.shift, env)
+    res = if left >= right then 1 else 0 end
+    return res, env
   else
     p "err: func is #{func}"
     return nil, env
@@ -221,6 +249,16 @@ def test_eval()
     { src: "(do (setq i 0) (setq i (+ i 1)))", srcenv: {}, exp: nil, expenv: { i: 1 } },
     { src: "(do (setq i 0) (+= i 3))", srcenv: {}, exp: nil, expenv: { i: 3 } },
     { src: "(do (setq i 10) (-= i 1))", srcenv: {}, exp: nil, expenv: { i: 9 } },
+    { src: "(< a 2)", srcenv: { a: 1 }, exp: 1, expenv: { a: 1 } },
+    { src: "(< a 2)", srcenv: { a: 2 }, exp: 0, expenv: { a: 2 } },
+    { src: "(> a 2)", srcenv: { a: 2 }, exp: 0, expenv: { a: 2 } },
+    { src: "(> a 2)", srcenv: { a: 3 }, exp: 1, expenv: { a: 3 } },
+    { src: "(<= a 2)", srcenv: { a: 1 }, exp: 1, expenv: { a: 1 } },
+    { src: "(<= a 2)", srcenv: { a: 2 }, exp: 1, expenv: { a: 2 } },
+    { src: "(<= a 2)", srcenv: { a: 3 }, exp: 0, expenv: { a: 3 } },
+    { src: "(>= a 2)", srcenv: { a: 1 }, exp: 0, expenv: { a: 1 } },
+    { src: "(>= a 2)", srcenv: { a: 2 }, exp: 1, expenv: { a: 2 } },
+    { src: "(>= a 2)", srcenv: { a: 3 }, exp: 1, expenv: { a: 3 } },
   ]
 
   for t in tests
@@ -228,9 +266,11 @@ def test_eval()
     act, envout = eval ast, t[:srcenv]
     if act != t[:exp]
       puts "want #{t[:exp]} but got #{act}"
+      puts "#{t}"
     end
     if envout != t[:expenv]
       puts "want #{t[:expenv]} but got #{envout}"
+      puts "#{t}"
     end
   end
 end
