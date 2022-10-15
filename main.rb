@@ -74,26 +74,38 @@ end
 
 test_parse
 
-def eval(ast)
-  ast.shift
-  ast.pop
+def eval_list(ast)
   func = ast.shift
 
   case func
   when "+"
-    default = ast.shift.to_i
-    return ast.inject(default) { |sum, i| sum + i.to_i }
+    default = eval(ast.shift)
+    return ast.inject(default) { |sum, i| sum + eval(i) }
   when "-"
-    default = ast.shift.to_i
-    return ast.inject(default) { |res, i| res - i.to_i }
+    default = eval(ast.shift)
+    return ast.inject(default) { |res, i| res - eval(i) }
   when "*"
-    default = ast.shift.to_i
-    return ast.inject(default) { |mul, i| mul * i.to_i }
+    default = eval(ast.shift)
+    return ast.inject(default) { |mul, i| mul * eval(i) }
   when "/"
-    default = ast.shift.to_i
-    return ast.inject(default) { |res, i| res / i.to_i }
+    default = eval(ast.shift)
+    return ast.inject(default) { |res, i| res / eval(i) }
   else
     p "err: func is #{func}"
+  end
+end
+
+def eval_num(ast)
+  return ast.to_i
+end
+
+def eval(ast)
+  if ast.instance_of?(Array)
+    return eval_list(ast)
+  elsif ast.instance_of?(String)
+    return eval_num(ast)
+  else
+    p "err: got #{ast}"
   end
 end
 
@@ -104,7 +116,7 @@ def test_eval()
     { src: "(* 1 2)", exp: 2 },
     { src: "(/ 1 2)", exp: 0 },
     { src: "(+ 10 2)", exp: 12 },
-    { src: "(+ -10 2)", exp: 8 },
+    { src: "(+ -10 2)", exp: -8 },
     { src: "(+ -10 252)", exp: 242 },
     { src: "(*  1 (+ 2 3))", exp: 5 },
     { src: "(*  (+ 3 2) (- 13 4))", exp: 45 },
@@ -127,6 +139,8 @@ def main()
     if text == nil
       break
     end
-    puts "#{eval lex text}"
+    puts "#{eval parse lex text}"
   end
 end
+
+main
