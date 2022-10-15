@@ -127,6 +127,7 @@ def eval_list(ast, env)
     end
   else
     p "err: func is #{func}"
+    return nil, env
   end
 end
 
