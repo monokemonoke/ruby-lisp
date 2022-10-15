@@ -20,6 +20,8 @@ def test_lex()
     { src: "(while i (setq i (- i 1)))", exp: ["(", "while", "i", "(", "setq", "i", "(", "-", "i", "1", ")", ")", ")"] },
     { src: "(print a 2)", exp: ["(", "print", "a", "2", ")"] },
     { src: "(do (setq i 0) (+ i 1))", exp: ["(", "do", "(", "setq", "i", "0", ")", "(", "+", "i", "1", ")", ")"] },
+    { src: "(+= a 2)", exp: ["(", "+=", "a", "2", ")"] },
+    { src: "(-= a 2)", exp: ["(", "-=", "a", "2", ")"] },
   ]
 
   for t in tests
@@ -74,6 +76,8 @@ def test_parse()
     { src: "(while i (setq i (- i 1)))", exp: ["while", "i", ["setq", "i", ["-", "i", "1"]]] },
     { src: "(print a 2)", exp: ["print", "a", "2"] },
     { src: "(do (setq i 0) (+ i 1))", exp: ["do", ["setq", "i", "0"], ["+", "i", "1"]] },
+    { src: "(+= a 2)", exp: ["+=", "a", "2"] },
+    { src: "(-= a 2)", exp: ["-=", "a", "2"] },
   ]
 
   for t in tests
@@ -155,6 +159,24 @@ def eval_list(ast, env)
       _, env = eval(statement, env)
     end
     return nil, env
+  when "+="
+    symbol = ast.shift
+    default, env = eval(symbol, env)
+    res = ast.inject(default) do |sum, i|
+      val, env = eval(i, env)
+      sum += val
+    end
+    env[symbol.intern] = res
+    return nil, env
+  when "-="
+    symbol = ast.shift
+    default, env = eval(symbol, env)
+    res = ast.inject(default) do |sum, i|
+      val, env = eval(i, env)
+      sum -= val
+    end
+    env[symbol.intern] = res
+    return nil, env
   else
     p "err: func is #{func}"
     return nil, env
@@ -197,6 +219,8 @@ def test_eval()
     { src: "(if 1 1 2)", srcenv: {}, exp: 1, expenv: {} },
     { src: "(while i (setq i (- i 1)))", srcenv: { i: 10 }, exp: nil, expenv: { i: 0 } },
     { src: "(do (setq i 0) (setq i (+ i 1)))", srcenv: {}, exp: nil, expenv: { i: 1 } },
+    { src: "(do (setq i 0) (+= i 3))", srcenv: {}, exp: nil, expenv: { i: 3 } },
+    { src: "(do (setq i 10) (-= i 1))", srcenv: {}, exp: nil, expenv: { i: 9 } },
   ]
 
   for t in tests
