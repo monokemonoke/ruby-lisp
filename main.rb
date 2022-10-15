@@ -16,6 +16,7 @@ def test_lex()
     { src: "(*  1 (+ 2 3))", exp: ["(", "*", "1", "(", "+", "2", "3", ")", ")"] },
     { src: "(setq a 2)", exp: ["(", "setq", "a", "2", ")"] },
     { src: "(+ a 2)", exp: ["(", "+", "a", "2", ")"] },
+    { src: "(if 0 1 2)", exp: ["(", "if", "0", "1", "2", ")"] },
   ]
 
   for t in tests
@@ -66,6 +67,7 @@ def test_parse()
     { src: "(*  (+ 3 2) (- 13 4))", exp: ["*", ["+", "3", "2"], ["-", "13", "4"]] },
     { src: "(setq a 2)", exp: ["setq", "a", "2"] },
     { src: "(+ a 2)", exp: ["+", "a", "2"] },
+    { src: "(if 0 1 2)", exp: ["if", "0", "1", "2"] },
   ]
 
   for t in tests
@@ -152,6 +154,8 @@ def test_eval()
     { src: "(*  (+ 3 2) (- 13 4))", srcenv: {}, exp: 45, expenv: {} },
     { src: "(setq a 2)", srcenv: {}, exp: nil, expenv: { a: 2 } },
     { src: "(+ a 2)", srcenv: { a: 2 }, exp: 4, expenv: { a: 2 } },
+    { src: "(if 0 1 2)", srcenv: {}, exp: 2, expenv: {} },
+    { src: "(if 1 1 2)", srcenv: {}, exp: 1, expenv: {} },
   ]
 
   for t in tests
@@ -182,4 +186,4 @@ def main()
   end
 end
 
-main
+# main
