@@ -277,11 +277,34 @@ end
 
 test_eval
 
+def get_text()
+  print "> "
+  text = ""
+  while true
+    line = gets
+    if line == nil
+      return nil
+    end
+    text = text + line
+
+    leftparen = text.count("(")
+    rightparen = text.count(")")
+    if leftparen == rightparen && line.end_with?(")\n")
+      return text
+    end
+
+    if leftparen > rightparen
+      print "  " * (leftparen - rightparen + 1)
+    else
+      print "  "
+    end
+  end
+end
+
 def main()
   env = {}
   while true
-    print "> "
-    text = gets
+    text = get_text
     if text == nil
       break
     end
