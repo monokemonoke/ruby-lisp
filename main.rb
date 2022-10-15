@@ -18,6 +18,7 @@ def test_lex()
     { src: "(+ a 2)", exp: ["(", "+", "a", "2", ")"] },
     { src: "(if 0 1 2)", exp: ["(", "if", "0", "1", "2", ")"] },
     { src: "(while i (setq i (- i 1)))", exp: ["(", "while", "i", "(", "setq", "i", "(", "-", "i", "1", ")", ")", ")"] },
+    { src: "(print a 2)", exp: ["(", "print", "a", "2", ")"] },
   ]
 
   for t in tests
@@ -70,6 +71,7 @@ def test_parse()
     { src: "(+ a 2)", exp: ["+", "a", "2"] },
     { src: "(if 0 1 2)", exp: ["if", "0", "1", "2"] },
     { src: "(while i (setq i (- i 1)))", exp: ["while", "i", ["setq", "i", ["-", "i", "1"]]] },
+    { src: "(print a 2)", exp: ["print", "a", "2"] },
   ]
 
   for t in tests
@@ -139,6 +141,13 @@ def eval_list(ast, env)
         _, env = eval(statement.clone, env)
       end
     end
+  when "print"
+    for leaf in ast
+      val, env = eval(leaf, env)
+      print "#{val}"
+    end
+    puts
+    return nil, env
   else
     p "err: func is #{func}"
     return nil, env
