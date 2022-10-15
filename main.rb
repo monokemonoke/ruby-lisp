@@ -1,10 +1,10 @@
-def parse(src)
+def lex(src)
   src.sub!("(", " ( ")
   src.sub!(")", " ) ")
   return src.split(" ")
 end
 
-def test_parse()
+def test_lex()
   tests = [
     { src: "(+ 1 2)", exp: ["(", "+", "1", "2", ")"] },
     { src: "(- 1 2)", exp: ["(", "-", "1", "2", ")"] },
@@ -13,17 +13,18 @@ def test_parse()
     { src: "(+ 10 2)", exp: ["(", "+", "10", "2", ")"] },
     { src: "(+ -10 2)", exp: ["(", "+", "-10", "2", ")"] },
     { src: "(+ -10 252)", exp: ["(", "+", "-10", "252", ")"] },
+    { src: "(*  1 (+ 2 3))", exp: ["(", "*", "1", "(+", "2", "3", ")", ")"] },
   ]
 
   for t in tests
-    act = parse t[:src]
+    act = lex t[:src]
     if act != t[:exp]
       puts "want #{t[:exp]} but got #{act}"
     end
   end
 end
 
-test_parse
+test_lex
 
 def eval(ast)
   ast.shift
@@ -60,7 +61,7 @@ def test_eval()
   ]
 
   for testsrc in testsrcs
-    p eval parse testsrc
+    p eval lex testsrc
   end
 end
 
@@ -70,5 +71,5 @@ while true
   if text == nil
     break
   end
-  puts "#{eval parse text}"
+  puts "#{eval lex text}"
 end
