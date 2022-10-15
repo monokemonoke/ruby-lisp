@@ -12,3 +12,33 @@ $ ruby --version
 ruby 3.1.2p20 (2022-04-12 revision 4491bb740a) [x86_64-darwin21]
 $ ruby main.rb
 ```
+
+## Usage
+
+簡単な四則計算ができます.
+
+```
+$ ruby main.rb
+> (+ 1 2)
+3
+> (- 7 3)
+4
+> (* 3 4)
+12
+> (/ 30 5)
+6
+```
+
+以下は 1 から 10 までの和を求めるプログラムです.
+
+```
+$ ruby main.rb
+> (setq i 10)
+
+> (setq sum 0)
+
+> (while i (do (setq sum (+ sum i)) (setq i (- i 1))))
+
+> (print sum)
+55
+```
