@@ -98,20 +98,27 @@ def eval(ast)
 end
 
 def test_eval()
-  testsrcs = [
-    "(+ 1 2)",
-    "(- 1 2)",
-    "(* 1 2)",
-    "(/ 1 2)",
-    "(+ 10 2)",
-    "(+ -10 2)",
-    "(+ -10 252)",
+  tests = [
+    { src: "(+ 1 2)", exp: 3 },
+    { src: "(- 1 2)", exp: -1 },
+    { src: "(* 1 2)", exp: 2 },
+    { src: "(/ 1 2)", exp: 0 },
+    { src: "(+ 10 2)", exp: 12 },
+    { src: "(+ -10 2)", exp: 8 },
+    { src: "(+ -10 252)", exp: 242 },
+    { src: "(*  1 (+ 2 3))", exp: 5 },
+    { src: "(*  (+ 3 2) (- 13 4))", exp: 45 },
   ]
 
-  for testsrc in testsrcs
-    p eval lex testsrc
+  for t in tests
+    act = eval parse lex t[:src]
+    if act != t[:exp]
+      puts "want #{t[:exp]} but got #{act}"
+    end
   end
 end
+
+test_eval
 
 def main()
   while true
