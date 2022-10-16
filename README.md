@@ -5,12 +5,19 @@ Ruby の学習のために作成しました.
 
 ## How To Run
 
-以下のコマンドを実行すると REPL 環境で Lisp を試すことができます.
+1. 以下のコマンドを実行すると REPL 環境で Lisp を試すことができます.
 
 ```
 $ ruby --version
 ruby 3.1.2p20 (2022-04-12 revision 4491bb740a) [x86_64-darwin21]
 $ ruby main.rb
+```
+
+2. 以下のように、ファイルを指定して実行することもできます.
+```
+$ ruby main.rb example/hello.lisp
+Hello
+"World"
 ```
 
 ## Usage
