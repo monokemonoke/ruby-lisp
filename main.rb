@@ -106,7 +106,6 @@ test_parse
 
 def eval_list(ast, env)
   ast = Marshal.load(Marshal.dump(ast))
-
   func = ast.shift
 
   case func
@@ -156,13 +155,14 @@ def eval_list(ast, env)
       return eval(ast.shift, env)
     end
   when "while"
-    cond, statement = ast
+    cond, *statements = ast
+    statements = ["do"].concat statements
     while true
       condval, env = eval(cond, env)
       if condval == 0
         return nil, env
       else
-        _, env = eval(statement.clone, env)
+        _, env = eval(Marshal.load(Marshal.dump(statements)), env)
       end
     end
   when "print"
