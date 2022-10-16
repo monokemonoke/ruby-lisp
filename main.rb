@@ -10,6 +10,7 @@ def test_lex()
     { src: "(- 1 2)", exp: ["(", "-", "1", "2", ")"] },
     { src: "(* 1 2)", exp: ["(", "*", "1", "2", ")"] },
     { src: "(/ 1 2)", exp: ["(", "/", "1", "2", ")"] },
+    { src: "(% 7 3)", exp: ["(", "%", "7", "3", ")"] },
     { src: "(+ 10 2)", exp: ["(", "+", "10", "2", ")"] },
     { src: "(+ -10 2)", exp: ["(", "+", "-10", "2", ")"] },
     { src: "(+ -10 252)", exp: ["(", "+", "-10", "252", ")"] },
@@ -70,6 +71,7 @@ def test_parse()
     { src: "(- 1 2)", exp: ["-", "1", "2"] },
     { src: "(* 1 2)", exp: ["*", "1", "2"] },
     { src: "(/ 1 2)", exp: ["/", "1", "2"] },
+    { src: "(% 7 3)", exp: ["%", "7", "3"] },
     { src: "(+ 10 2)", exp: ["+", "10", "2"] },
     { src: "(+ -10 2)", exp: ["+", "-10", "2"] },
     { src: "(+ -10 252)", exp: ["+", "-10", "252"] },
@@ -134,6 +136,10 @@ def eval_list(ast, env)
       sum /= val
     end
     return res, env
+  when "%"
+    a, env = eval(ast.shift, env)
+    b, env = eval(ast.shift, env)
+    return a % b, env
   when "setq"
     symbol = ast.shift
     val, env = eval(ast.shift, env)
@@ -257,6 +263,7 @@ def test_eval()
     { src: "(- 1 2)", srcenv: {}, exp: -1, expenv: {} },
     { src: "(* 1 2)", srcenv: {}, exp: 2, expenv: {} },
     { src: "(/ 1 2)", srcenv: {}, exp: 0, expenv: {} },
+    { src: "(% 7 3)", srcenv: {}, exp: 1, expenv: {} },
     { src: "(+ 10 2)", srcenv: {}, exp: 12, expenv: {} },
     { src: "(+ -10 2)", srcenv: {}, exp: -8, expenv: {} },
     { src: "(+ -10 252)", srcenv: {}, exp: 242, expenv: {} },
