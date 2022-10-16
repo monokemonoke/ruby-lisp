@@ -29,6 +29,7 @@ def test_lex()
     { src: "(>= a 2)", exp: ["(", ">=", "a", "2", ")"] },
     { src: "(== 2 2)", exp: ["(", "==", "2", "2", ")"] },
     { src: "(defun hoge () (print 100))", exp: ["(", "defun", "hoge", "(", ")", "(", "print", "100", ")", ")"] },
+    { src: "(print \"hogehoge\")", exp: ["(", "print", "\"hogehoge\"", ")"] },
   ]
 
   for t in tests
@@ -92,6 +93,7 @@ def test_parse()
     { src: "(>= a 2)", exp: [">=", "a", "2"] },
     { src: "(== 2 2)", exp: ["==", "2", "2"] },
     { src: "(defun hoge () (print 100))", exp: ["defun", "hoge", [], ["print", "100"]] },
+    { src: "(print \"hogehoge\")", exp: ["print", "\"hogehoge\""] },
   ]
 
   for t in tests
@@ -253,10 +255,17 @@ def eval_num(ast, env)
   return env[ast.intern]
 end
 
+def eval_str(ast, env)
+  return ast.gsub('\"', "")
+end
+
 def eval(ast, env)
   if ast.instance_of?(Array)
     return eval_list(ast, env)
   elsif ast.instance_of?(String)
+    if /^\".*\"$/.match?(ast)
+      return eval_str(ast, env), env
+    end
     return eval_num(ast, env), env
   else
     p "err: got #{ast}"
