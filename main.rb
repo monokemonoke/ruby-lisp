@@ -219,10 +219,16 @@ def eval_list(ast, env)
       return nil, env
     end
 
-    for statement in funcinfo[:codes]
-      _, env = eval(statement, env)
+    funcenv = Marshal.load(Marshal.dump(env))
+    funcinfo[:args].each do |name|
+      funcenv[name.intern], env = eval(ast.shift, env)
     end
-    return nil, env
+
+    res = nil
+    for statement in funcinfo[:codes]
+      res, funcenv = eval(statement, funcenv)
+    end
+    return res, env
   end
 end
 
@@ -275,8 +281,22 @@ def test_eval()
     { src: "(>= a 2)", srcenv: { a: 2 }, exp: 1, expenv: { a: 2 } },
     { src: "(>= a 2)", srcenv: { a: 3 }, exp: 1, expenv: { a: 3 } },
     { src: "(defun hoge () (print 100))", srcenv: {}, exp: nil, expenv: { hoge: { args: [], codes: [["print", "100"]] } } },
-    { src: "(hoge)", srcenv: { hoge: { args: [], codes: [["setq", "a", "100"]] } },
-      exp: nil, expenv: { a: 100, hoge: { args: [], codes: [["setq", "a", "100"]] } } },
+    { src: "(defun foo (n) (print n))", srcenv: {}, exp: nil, expenv: { foo: { args: ["n"], codes: [["print", "n"]] } } },
+    {
+      src: "(foo 23)", exp: 46,
+      srcenv: {
+        foo: {
+          args: ["n"],
+          codes: [["+", "n", "n"]],
+        },
+      },
+      expenv: {
+        foo: {
+          args: ["n"],
+          codes: [["+", "n", "n"]],
+        },
+      },
+    },
   ]
 
   for t in tests
