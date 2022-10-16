@@ -27,6 +27,7 @@ def test_lex()
     { src: "(> a 2)", exp: ["(", ">", "a", "2", ")"] },
     { src: "(<= a 2)", exp: ["(", "<=", "a", "2", ")"] },
     { src: "(>= a 2)", exp: ["(", ">=", "a", "2", ")"] },
+    { src: "(== 2 2)", exp: ["(", "==", "2", "2", ")"] },
     { src: "(defun hoge () (print 100))", exp: ["(", "defun", "hoge", "(", ")", "(", "print", "100", ")", ")"] },
   ]
 
@@ -89,6 +90,7 @@ def test_parse()
     { src: "(> a 2)", exp: [">", "a", "2"] },
     { src: "(<= a 2)", exp: ["<=", "a", "2"] },
     { src: "(>= a 2)", exp: [">=", "a", "2"] },
+    { src: "(== 2 2)", exp: ["==", "2", "2"] },
     { src: "(defun hoge () (print 100))", exp: ["defun", "hoge", [], ["print", "100"]] },
   ]
 
@@ -213,6 +215,11 @@ def eval_list(ast, env)
     right, env = eval(ast.shift, env)
     res = if left >= right then 1 else 0 end
     return res, env
+  when "=="
+    left, env = eval(ast.shift, env)
+    right, env = eval(ast.shift, env)
+    res = if left == right then 1 else 0 end
+    return res, env
   when "defun"
     symbol = ast.shift
     args = ast.shift
@@ -287,6 +294,8 @@ def test_eval()
     { src: "(>= a 2)", srcenv: { a: 1 }, exp: 0, expenv: { a: 1 } },
     { src: "(>= a 2)", srcenv: { a: 2 }, exp: 1, expenv: { a: 2 } },
     { src: "(>= a 2)", srcenv: { a: 3 }, exp: 1, expenv: { a: 3 } },
+    { src: "(== 2 2)", srcenv: {}, exp: 1, expenv: {} },
+    { src: "(== 1 2)", srcenv: {}, exp: 0, expenv: {} },
     { src: "(defun hoge () (print 100))", srcenv: {}, exp: nil, expenv: { hoge: { args: [], codes: [["print", "100"]] } } },
     { src: "(defun foo (n) (print n))", srcenv: {}, exp: nil, expenv: { foo: { args: ["n"], codes: [["print", "n"]] } } },
     {
