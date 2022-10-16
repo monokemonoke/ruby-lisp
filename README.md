@@ -59,3 +59,57 @@ $ ruby main.rb
 > (print b)
 1346269
 ```
+
+以下は FizzBuzz を行うプログラムです.
+
+```
+$ ruby main.rb
+> (defun fizzbuzz (n)
+    (setq i 1)
+    (while (<= i n)
+        (if (== (% i 15) 0)
+            (print "fizzbuzz")
+            (if (== (% i 3) 0)
+                (print "fizz")
+                (if (== (% i 5) 0)
+                    (print "buzz")
+                    (print i)
+                )
+            )
+        )
+        (+= i 1)
+    )
+)
+
+> (fizzbuzz 30)
+1
+2
+"fizz"
+4
+"buzz"
+"fizz"
+7
+8
+"fizz"
+"buzz"
+11
+"fizz"
+13
+14
+"fizzbuzz"
+16
+17
+"fizz"
+19
+"buzz"
+"fizz"
+22
+23
+"fizz"
+"buzz"
+26
+"fizz"
+28
+29
+"fizzbuzz"
+```
