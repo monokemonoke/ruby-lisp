@@ -364,7 +364,7 @@ def get_text()
   end
 end
 
-def main()
+def do_repl()
   env = {}
   while true
     text = get_text
@@ -374,6 +374,24 @@ def main()
     ast = parse lex text
     res, env = eval ast, env
     puts "#{res}"
+  end
+end
+
+def do_from_file(file)
+  program = File.read(file)
+
+  env = {}
+  lexed = lex program
+  lexed = ["(", "do"].concat(lexed).concat([")"])
+  ast = parse lexed
+  eval ast, env
+end
+
+def main()
+  if ARGV.size == 0
+    do_repl
+  else
+    do_from_file ARGV[0]
   end
 end
 
