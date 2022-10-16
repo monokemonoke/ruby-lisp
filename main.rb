@@ -256,7 +256,7 @@ def eval_num(ast, env)
 end
 
 def eval_str(ast, env)
-  return ast.gsub('\"', "")
+  return ast.gsub('"', "")
 end
 
 def eval(ast, env)

@@ -17,7 +17,7 @@ $ ruby main.rb
 ```
 $ ruby main.rb example/hello.lisp
 Hello
-"World"
+World
 ```
 
 ## Usage
@@ -91,32 +91,32 @@ $ ruby main.rb
 > (fizzbuzz 30)
 1
 2
-"fizz"
+fizz
 4
-"buzz"
-"fizz"
+buzz
+fizz
 7
 8
-"fizz"
-"buzz"
+fizz
+buzz
 11
-"fizz"
+fizz
 13
 14
-"fizzbuzz"
+fizzbuzz
 16
 17
-"fizz"
+fizz
 19
-"buzz"
-"fizz"
+buzz
+fizz
 22
 23
-"fizz"
-"buzz"
+fizz
+buzz
 26
-"fizz"
+fizz
 28
 29
-"fizzbuzz"
+fizzbuzz
 ```
