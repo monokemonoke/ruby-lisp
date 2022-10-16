@@ -213,7 +213,15 @@ def eval_list(ast, env)
     env[symbol.intern] = { args: args, codes: ast }
     return nil, env
   else
-    p "err: func is #{func}"
+    funcinfo = env[func.intern]
+    if funcinfo == nil
+      p "err: func  #{func} is not found"
+      return nil, env
+    end
+
+    for statement in funcinfo[:codes]
+      _, env = eval(statement, env)
+    end
     return nil, env
   end
 end
@@ -267,6 +275,8 @@ def test_eval()
     { src: "(>= a 2)", srcenv: { a: 2 }, exp: 1, expenv: { a: 2 } },
     { src: "(>= a 2)", srcenv: { a: 3 }, exp: 1, expenv: { a: 3 } },
     { src: "(defun hoge () (print 100))", srcenv: {}, exp: nil, expenv: { hoge: { args: [], codes: [["print", "100"]] } } },
+    { src: "(hoge)", srcenv: { hoge: { args: [], codes: [["setq", "a", "100"]] } },
+      exp: nil, expenv: { a: 100, hoge: { args: [], codes: [["setq", "a", "100"]] } } },
   ]
 
   for t in tests
